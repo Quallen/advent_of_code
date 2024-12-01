@@ -29,7 +29,18 @@ class Locations
     end
     puts distances.sum
   end
+
+  def similarity_scores
+    right_tally = right_list.tally
+    scores = []
+    length.times do |index|
+      value = left_list[index]
+      scores << value.to_i * right_tally[value].to_i
+    end
+    puts scores.sum
+  end
 end
 
 locations = Locations.new
 locations.calculate_distances
+locations.similarity_scores
