@@ -3,18 +3,40 @@ require 'pry-byebug'
 
 class Reactor
 
-  attr_accessor :input, :reports
+  attr_accessor :input, :reports, :meta_reports
 
   def initialize
     @input = File.read('problem_2_input.txt').lines.map(&:chomp)
-    @reports = []
+    @reports, @meta_reports = [], []
     input.each do |line|
-      reports << Report.new(data: line.split(" ").map(&:to_i))
+      values = line.split(" ").map(&:to_i)
+      reports << Report.new(data: values)
+      meta_reports << MetaReport.new(data: values)
     end
   end
 
   def check_reports
     puts reports.count{|report| report.safe? }
+    puts meta_reports.count{|report| report.safe? }
+  end
+
+  class MetaReport
+    attr_accessor :data, :values, :reports
+
+    def initialize(data:)
+      @values = data
+      @reports = []
+      reports << Report.new(data: data)
+      values.count.times do |sub_report|
+        sub_array = values.dup
+        sub_array.delete_at(sub_report)
+        reports << Report.new(data: sub_array)
+      end
+    end
+
+    def safe?
+      reports.any?{ |report| report.safe? }
+    end
   end
 
   class Report
