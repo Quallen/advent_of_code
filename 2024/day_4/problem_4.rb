@@ -8,9 +8,9 @@ class Search
     @length = 140
     @grid = Array.new(length){Array.new(length)}
     init_grid
-    @possible_xmas_starts = []
+    @possible_xmas_starts, @possible_x_mas_starts = [], []
     get_start_locations
-    @xmas_count = 0
+    @xmas_count, @x_mas_count = 0, 0
   end
 
   def init_grid
@@ -25,6 +25,7 @@ class Search
     input.each_with_index do |line, row_index|
       line.each_char.with_index  do |character, column_index|
         @possible_xmas_starts << @grid[row_index][column_index] if @grid[row_index][column_index].word_start?
+        @possible_x_mas_starts << @grid[row_index][column_index] if @grid[row_index][column_index].a?
       end
     end
   end
@@ -38,6 +39,12 @@ class Search
     puts @xmas_count
   end
 
+  def get_x_mas_count
+    @possible_x_mas_starts.each do |location|
+      scan_x_mas(location)
+    end
+    puts @x_mas_count
+  end
 
   def scan_right(point)
     return if point.x + 3 > length - 1
@@ -79,6 +86,14 @@ class Search
     @xmas_count += 1 if @grid[point.x-1][point.y-1].m? && @grid[point.x-2][point.y-2].a? && @grid[point.x-3][point.y-3].s?
   end
 
+  def scan_x_mas(point)
+    return if point.x - 1 < 0 || point.y - 1 < 0 || point.x + 1 > length - 1 || point.y + 1 > length - 1
+    @x_mas_count += 1 if @grid[point.x-1][point.y-1].m? && @grid[point.x+1][point.y-1].s? && @grid[point.x-1][point.y+1].m? && @grid[point.x+1][point.y+1].s?
+    @x_mas_count += 1 if @grid[point.x-1][point.y-1].m? && @grid[point.x+1][point.y-1].m? && @grid[point.x-1][point.y+1].s? && @grid[point.x+1][point.y+1].s?
+    @x_mas_count += 1 if @grid[point.x-1][point.y-1].s? && @grid[point.x+1][point.y-1].m? && @grid[point.x-1][point.y+1].s? && @grid[point.x+1][point.y+1].m?
+    @x_mas_count += 1 if @grid[point.x-1][point.y-1].s? && @grid[point.x+1][point.y-1].s? && @grid[point.x-1][point.y+1].m? && @grid[point.x+1][point.y+1].m?
+  end
+
   class Location
     attr_accessor :coordinates, :letter
     def initialize(letter: ,coords:)
@@ -114,3 +129,4 @@ class Search
 end
 search = Search.new
 search.get_xmas_count
+search.get_x_mas_count
