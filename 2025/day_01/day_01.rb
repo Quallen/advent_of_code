@@ -12,7 +12,6 @@ class Dial
   def find_password
     input.each do |line|
       update_position(direction: line[0] == 'L' ? :left : :right, value: line[1..].to_i)
-      @password_count += 1 if @position == 0
     end
     puts @password_count
   end
@@ -23,13 +22,19 @@ class Dial
       value.times do
         @position -= 1
         @position = @position < 0 ? 99 : @position
+        check_password_count
       end
     when :right
       value.times do
         @position += 1
         @position = @position > 99 ? 0 : @position
+        check_password_count
       end
     end
+  end
+
+  def check_password_count
+    @password_count += 1 if @position == 0
   end
 end
 
