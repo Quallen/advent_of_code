@@ -15,16 +15,18 @@ class Product
       range_start = ids.first.to_i
       range_end = ids.last.to_i
       (range_start..range_end).each do |id|
-        @invalid_ids << id if invalid_id?(id.to_s)
+        @invalid_ids << id if repeating_pattern?(id.to_s)
       end
     end
     puts @invalid_ids.sum
   end
 
-  def invalid_id?(id)
-    return false if id.length == 1
-    midpoint = id.length / 2
-    id[0,midpoint] == id[midpoint,id.length-1]
+  def repeating_pattern?(id)
+    patterns = id.scan(/(.+?)(?=\1+$|$)/)
+
+    repeated_patterns = patterns.flatten.select{ |pattern| id.scan(Regexp.new(Regexp.escape(pattern))).size > 1 }
+
+    repeated_patterns.any?
   end
 end
 
