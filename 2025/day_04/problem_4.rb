@@ -30,6 +30,11 @@ class Map
   end
 
   def find_accessible
+    puts find_initial_accessible
+    puts find_total_accessible
+  end
+
+  def find_initial_accessible
     accessible_count = 0
 
     map.each_with_index do |row, row_index|
@@ -37,7 +42,23 @@ class Map
         accessible_count += 1 if value.positive? && adjacency_count(x: row_index, y: column_index) < 4
       end
     end
-    puts accessible_count
+    accessible_count
+  end
+
+  def find_total_accessible
+    accessible_count = 0
+
+    loop do
+      iteration_start_count = accessible_count
+      map.each_with_index do |row, row_index|
+        row.each_with_index do |value, column_index|
+          accessible_count += 1 and map[row_index][column_index] = 0 if value.positive? && adjacency_count(x: row_index, y: column_index) < 4
+        end
+      end
+      break if iteration_start_count == accessible_count
+    end
+
+    accessible_count
   end
 
   def adjacency_count(x:,y:)
