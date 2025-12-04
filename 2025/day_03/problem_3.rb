@@ -14,7 +14,8 @@ class JoltageFinder
   end
 
   def total_joltage
-    puts @battery_banks.sum{ |battery| battery.max_joltage }
+    puts @battery_banks.sum{ |battery| battery.two_battery_max_joltage }
+    puts @battery_banks.sum{ |battery| battery.twelve_battery_max_joltage }
   end
 end
 
@@ -25,7 +26,7 @@ class BatteryBank
     @batteries = data
   end
 
-  def max_joltage
+  def two_battery_max_joltage
     max = 0
     batteries.each_char.with_index do |battery, position|
       sub_string = batteries[position+1..-1]
@@ -35,6 +36,20 @@ class BatteryBank
       end
     end
     max
+  end
+
+  def twelve_battery_max_joltage
+    batteries_needed = 12
+    number_to_remove = batteries.length - batteries_needed
+    stack = []
+    batteries.each_char do |battery|
+      while number_to_remove > 0 && !stack.empty? && stack.last < battery
+        stack.pop
+        number_to_remove -= 1
+      end
+      stack.push(battery)
+    end
+    stack.first(batteries_needed).join.to_i
   end
 end
 
