@@ -34,9 +34,29 @@ class IngredientDatabase
     end
   end
 
-  def fresh_count
+  def fresh_counts
     puts @fresh.count
+    puts total_fresh_ids
+  end
+
+  def total_fresh_ids
+    sorted_ranges = @fresh_id_ranges.dup
+    loop do
+      overlap_count = 0
+      sorted_ranges.reject!{|range| range.size == 0}
+      sorted_ranges.sort_by!(&:end).each_with_index do |range, index|
+        next if index+1 == sorted_ranges.count
+        next unless range.overlap?(next_range = sorted_ranges[index + 1])
+
+        sorted_ranges[index] = (range.begin...next_range.begin) if range.end >= next_range.begin
+
+        overlap_count += 1
+      end
+      break if overlap_count.zero?
+    end
+
+    sorted_ranges.sum{|id_range| id_range.size}
   end
 end
 
-IngredientDatabase.new.fresh_count
+IngredientDatabase.new.fresh_counts
